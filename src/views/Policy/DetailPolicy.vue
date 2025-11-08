@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { Policy } from '@/interfaces/Policy'
-import { getPolicyById, payPolicy } from '@/services/policy'
+import { getPolicyById, payPolicy } from '@/store/policy'
 
 const router = useRouter()
 const route = useRoute()

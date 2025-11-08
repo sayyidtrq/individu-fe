@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { InsurancePlan } from '@/interfaces/Insurance'
-import { getInsurancePlanById, insurancePlanService } from '@/services/insurancePlan'
+import { getInsurancePlanById, insurancePlanService } from '@/store/insurancePlan'
 
 const router = useRouter()
 const route = useRoute()

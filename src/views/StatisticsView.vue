@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { statisticsService } from '@/services/statistics'
+import { statisticsService } from '@/store/statistics'
 import LineChart from '@/components/Statistics/LineChart.vue'
 import type { Statistics } from '@/interfaces/Statistics'
 

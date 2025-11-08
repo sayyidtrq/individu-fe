@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { orderedPlanService } from '@/services/orderedPlan'
+import { orderedPlanService } from '@/store/orderedPlan'
 import type { OrderedPlan, ClaimInOrderedPlan } from '@/interfaces/OrderedPlan'
 
 const route = useRoute()

@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import InsuranceForm from '@/components/InsurancePlan/InsuranceForm.vue'
 import type { CreateInsurancePlanDTO, InsurancePlan } from '@/interfaces/Insurance'
-import { getInsurancePlanById, insurancePlanService } from '@/services/insurancePlan'
+import { getInsurancePlanById, insurancePlanService } from '@/store/insurancePlan'
 
 const router = useRouter()
 const route = useRoute()

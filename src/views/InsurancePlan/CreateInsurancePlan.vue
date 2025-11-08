@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import InsuranceForm from '@/components/InsurancePlan/InsuranceForm.vue'
 import type { CreateInsurancePlanDTO } from '@/interfaces/Insurance'
-import { createInsurancePlan } from '@/services/insurancePlan'
+import { createInsurancePlan } from '@/store/insurancePlan'
 
 const router = useRouter()
 const isLoading = ref(false)

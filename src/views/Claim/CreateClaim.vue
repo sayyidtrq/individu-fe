@@ -2,8 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ClaimForm from '@/components/Claim/ClaimForm.vue'
-import { orderedPlanService } from '@/services/orderedPlan'
-import { claimService } from '@/services/claim'
+import { orderedPlanService } from '@/store/orderedPlan'
+import { claimService } from '@/store/claim'
 import type { OrderedPlan } from '@/interfaces/OrderedPlan'
 
 const route = useRoute()

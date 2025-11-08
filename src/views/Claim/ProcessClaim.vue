@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { claimService } from '@/services/claim'
+import { claimService } from '@/store/claim'
 import type { Claim } from '@/interfaces/Claim'
 
 const route = useRoute()

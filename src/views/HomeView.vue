@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { statisticsService } from '@/services/statistics'
+import { statisticsService } from '@/store/statistics'
 import type { DashboardStats } from '@/interfaces/Statistics'
 
 const stats = ref<DashboardStats>({

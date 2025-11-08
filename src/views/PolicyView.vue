@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { policyService } from '@/services/policy'
+import { policyService } from '@/store/policy'
 import type { Policy } from '@/interfaces/Policy'
+import { DataTable } from 'simple-datatables'
 
 const policies = ref<Policy[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
-
-// Pagination
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
-const searchQuery = ref('')
+let dataTable: DataTable | null = null
 
 // Fetch data
 const fetchPolicies = async () => {
@@ -20,6 +17,11 @@ const fetchPolicies = async () => {
     error.value = null
     const data = await policyService.getAllPolicies()
     policies.value = data
+    
+    // Initialize DataTable after data is loaded
+    setTimeout(() => {
+      initDataTable()
+    }, 100)
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load policies'
     console.error('Error fetching policies:', err)
@@ -27,35 +29,6 @@ const fetchPolicies = async () => {
     loading.value = false
   }
 }
-
-// Filtered data based on search
-const filteredPolicies = computed(() => {
-  if (!searchQuery.value) {
-    return policies.value
-  }
-
-  const query = searchQuery.value.toLowerCase()
-  return policies.value.filter((policy) => {
-    return (
-      policy.id.toLowerCase().includes(query) ||
-      policy.userId.toLowerCase().includes(query) ||
-      policy.service.toLowerCase().includes(query) ||
-      policy.status.toLowerCase().includes(query)
-    )
-  })
-})
-
-// Paginated data
-const paginatedPolicies = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return filteredPolicies.value.slice(start, end)
-})
-
-// Total pages
-const totalPages = computed(() => {
-  return Math.ceil(filteredPolicies.value.length / itemsPerPage.value)
-})
 
 // Format currency
 const formatCurrency = (amount: number) => {
@@ -90,16 +63,36 @@ const formatStatus = (status: string) => {
   return statusMap[status] || status
 }
 
-// Handle page change
-const goToPage = (page: number) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
+// Initialize DataTable
+const initDataTable = () => {
+  if (dataTable) {
+    dataTable.destroy()
   }
-}
 
-// Reset to first page when search changes
-const handleSearch = () => {
-  currentPage.value = 1
+  const tableElement = document.getElementById('policy-table')
+  if (tableElement && policies.value.length > 0) {
+    dataTable = new DataTable(tableElement, {
+      searchable: true,
+      sortable: true,
+      perPage: 10,
+      perPageSelect: [10, 25, 50, 100],
+      labels: {
+        placeholder: 'Search...',
+        perPage: 'data per halaman',
+        noRows: 'No policies found',
+        info: 'Menampilkan {start} sampai {end} dari {rows} data'
+      },
+      columns: [
+        { select: 0, sortable: true },
+        { select: 1, sortable: true },
+        { select: 2, sortable: true },
+        { select: 3, sortable: true, type: 'number' },
+        { select: 4, sortable: true, type: 'number' },
+        { select: 5, sortable: true },
+        { select: 6, sortable: false }
+      ]
+    })
+  }
 }
 
 onMounted(() => {
@@ -131,41 +124,6 @@ onMounted(() => {
 
       <!-- DataTable Card -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-        <!-- Table Controls -->
-        <div class="p-4 border-b border-gray-200">
-          <div class="flex flex-col sm:flex-row justify-between gap-4">
-            <!-- Show entries dropdown -->
-            <div class="flex items-center gap-2">
-              <label for="entries" class="text-sm text-gray-700">Tampilkan</label>
-              <select
-                id="entries"
-                v-model="itemsPerPage"
-                class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                @change="currentPage = 1"
-              >
-                <option :value="10">10</option>
-                <option :value="25">25</option>
-                <option :value="50">50</option>
-                <option :value="100">100</option>
-              </select>
-              <span class="text-sm text-gray-700">data per halaman</span>
-            </div>
-
-            <!-- Search -->
-            <div class="flex items-center gap-2">
-              <label for="search" class="text-sm text-gray-700">Cari:</label>
-              <input
-                id="search"
-                v-model="searchQuery"
-                type="text"
-                placeholder="Search..."
-                class="px-4 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
-                @input="handleSearch"
-              />
-            </div>
-          </div>
-        </div>
-
         <!-- Loading State -->
         <div v-if="loading" class="flex justify-center items-center py-12">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -181,65 +139,30 @@ onMounted(() => {
 
         <!-- Table -->
         <div v-else class="overflow-x-auto">
-          <table class="w-full text-sm text-left">
+          <table id="policy-table" class="w-full text-sm text-left">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
               <tr>
-                <th scope="col" class="px-6 py-3 font-medium">
-                  <div class="flex items-center gap-1">
-                    ID
-                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10l5 5 5-5H7z" />
-                    </svg>
-                  </div>
-                </th>
-                <th scope="col" class="px-6 py-3 font-medium">
-                  <div class="flex items-center gap-1">
-                    User ID
-                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10l5 5 5-5H7z" />
-                    </svg>
-                  </div>
-                </th>
-                <th scope="col" class="px-6 py-3 font-medium">
-                  <div class="flex items-center gap-1">
-                    Service
-                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10l5 5 5-5H7z" />
-                    </svg>
-                  </div>
-                </th>
-                <th scope="col" class="px-6 py-3 font-medium text-center">
-                  <div class="flex items-center justify-center gap-1">
-                    Plan Amount
-                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10l5 5 5-5H7z" />
-                    </svg>
-                  </div>
-                </th>
-                <th scope="col" class="px-6 py-3 font-medium text-right">
-                  <div class="flex items-center justify-end gap-1">
-                    Coverage Amount
-                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10l5 5 5-5H7z" />
-                    </svg>
-                  </div>
-                </th>
+                <th scope="col" class="px-6 py-3 font-medium">ID</th>
+                <th scope="col" class="px-6 py-3 font-medium">User ID</th>
+                <th scope="col" class="px-6 py-3 font-medium">Service</th>
+                <th scope="col" class="px-6 py-3 font-medium text-center">Plan Amount</th>
+                <th scope="col" class="px-6 py-3 font-medium text-right">Coverage Amount</th>
                 <th scope="col" class="px-6 py-3 font-medium text-center">Status</th>
                 <th scope="col" class="px-6 py-3 font-medium text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr
-                v-for="policy in paginatedPolicies"
+                v-for="policy in policies"
                 :key="policy.id"
                 class="bg-white border-b border-gray-200 hover:bg-gray-50 transition-colors"
               >
-                <td class="px-6 py-4 font-medium text-gray-900">{{ policy.id }}</td>
+                <td class="px-6 py-4 font-medium text-gray-900" :data-sort="policy.id">{{ policy.id }}</td>
                 <td class="px-6 py-4 text-gray-700">{{ policy.userId }}</td>
                 <td class="px-6 py-4 text-gray-900">{{ policy.service }}</td>
-                <td class="px-6 py-4 text-gray-900 text-center">{{ policy.orderedPlans?.length || 0 }}</td>
-                <td class="px-6 py-4 text-gray-900 text-right">{{ formatCurrency(policy.totalCoverage) }}</td>
-                <td class="px-6 py-4 text-center">
+                <td class="px-6 py-4 text-gray-900 text-center" :data-sort="policy.orderedPlans?.length || 0">{{ policy.orderedPlans?.length || 0 }}</td>
+                <td class="px-6 py-4 text-gray-900 text-right" :data-sort="policy.totalCoverage">{{ formatCurrency(policy.totalCoverage) }}</td>
+                <td class="px-6 py-4 text-center" :data-sort="policy.status">
                   <span :class="['px-3 py-1 rounded-full text-xs font-medium', getStatusColor(policy.status)]">
                     {{ formatStatus(policy.status) }}
                   </span>
@@ -255,73 +178,8 @@ onMounted(() => {
                   </div>
                 </td>
               </tr>
-              <tr v-if="paginatedPolicies.length === 0">
-                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                  No policies found
-                </td>
-              </tr>
             </tbody>
           </table>
-        </div>
-
-        <!-- Pagination -->
-        <div v-if="!loading && !error && filteredPolicies.length > 0" class="p-4 border-t border-gray-200">
-          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <!-- Showing info -->
-            <div class="text-sm text-gray-700">
-              Menampilkan {{ (currentPage - 1) * itemsPerPage + 1 }} sampai 
-              {{ Math.min(currentPage * itemsPerPage, filteredPolicies.length) }} dari 
-              {{ filteredPolicies.length }} data
-            </div>
-
-            <!-- Pagination buttons -->
-            <div class="flex items-center gap-1">
-              <button
-                @click="goToPage(1)"
-                :disabled="currentPage === 1"
-                class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Pertama
-              </button>
-              <button
-                @click="goToPage(currentPage - 1)"
-                :disabled="currentPage === 1"
-                class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Sebelumnya
-              </button>
-
-              <!-- Page numbers -->
-              <button
-                v-for="page in totalPages"
-                :key="page"
-                @click="goToPage(page)"
-                :class="[
-                  'px-3 py-1.5 text-sm border rounded-lg transition-colors',
-                  currentPage === page
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'border-gray-300 hover:bg-gray-50'
-                ]"
-              >
-                {{ page }}
-              </button>
-
-              <button
-                @click="goToPage(currentPage + 1)"
-                :disabled="currentPage === totalPages"
-                class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Selanjutnya
-              </button>
-              <button
-                @click="goToPage(totalPages)"
-                :disabled="currentPage === totalPages"
-                class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Terakhir
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
