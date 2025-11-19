@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: insurance-fe-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  tls:
+    - hosts:
+        - 2306275714-fe.hafizmuh.site # <- Ubah sesuai nama domain kalian
+      secretName: fe-hafizmuh-site-tls
+  rules:
+    - host: 2306275714-fe.hafizmuh.site # <- Ubah sesuai nama domain kalian
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: insurance-fe-service
+                port:
+                  number: 80

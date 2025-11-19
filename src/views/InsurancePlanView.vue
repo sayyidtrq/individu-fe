@@ -53,7 +53,7 @@ const initDataTable = () => {
 
   const tableElement = document.getElementById('insurance-table')
   if (tableElement && insurancePlans.value.length > 0) {
-    dataTable = new DataTable(tableElement, {
+    dataTable = new DataTable(tableElement as HTMLTableElement, {
       searchable: true,
       sortable: true,
       perPage: 10,

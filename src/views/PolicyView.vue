@@ -71,7 +71,7 @@ const initDataTable = () => {
 
   const tableElement = document.getElementById('policy-table')
   if (tableElement && policies.value.length > 0) {
-    dataTable = new DataTable(tableElement, {
+    dataTable = new DataTable(tableElement as HTMLTableElement, {
       searchable: true,
       sortable: true,
       perPage: 10,

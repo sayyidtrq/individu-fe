@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insurance-fe
+  labels:
+    app: insurance-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: insurance-fe
+  template:
+    metadata:
+      labels:
+        app: insurance-fe
+    spec:
+      containers:
+        - name: insurance-fe
+          image: sayyidthariq/tugasindividu-fe:REPLACE_ME_TAG
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

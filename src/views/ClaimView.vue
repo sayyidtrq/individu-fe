@@ -73,7 +73,7 @@ const initDataTable = () => {
 
   const tableElement = document.getElementById('claim-table')
   if (tableElement && claims.value.length > 0) {
-    dataTable = new DataTable(tableElement, {
+    dataTable = new DataTable(tableElement as HTMLTableElement, {
       searchable: true,
       sortable: true,
       perPage: 10,

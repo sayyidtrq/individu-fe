@@ -247,8 +247,7 @@ onMounted(() => {
             </div>
             <div>
               <span class="font-medium">Last Updated:</span>
-              {{ new Date(insurancePlan.updatedAt).toLocaleString('id-ID') }}
-            </div>
+              {{ insurancePlan.updatedAt ? new Date(insurancePlan.updatedAt).toLocaleString('id-ID') : 'N/A' }}            </div>
           </div>
         </div>
       </div>

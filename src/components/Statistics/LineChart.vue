@@ -46,8 +46,7 @@ const generateMonthLabels = (start: Date, end: Date, count: number): string[] =>
   for (let i = 0; i < count; i++) {
     const date = new Date(start)
     date.setMonth(start.getMonth() + i)
-    months.push(monthNames[date.getMonth()])
-  }
+    months.push(monthNames[date.getMonth()] ?? '')  }
   
   return months
 }
