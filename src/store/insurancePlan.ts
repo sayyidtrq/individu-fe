@@ -18,7 +18,7 @@ export const insurancePlanService = {
     const result: BaseResponse<InsurancePlan> = await response.json()
     return result
   },
-  //commit anjing 2
+  //commit anjing 3
   async createInsurancePlan(data: CreateInsurancePlanDTO): Promise<BaseResponse<InsurancePlan>> {
     const response = await fetch(`${API_BASE_URL}/create`, {
       method: 'POST',
