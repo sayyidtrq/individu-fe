@@ -7,7 +7,7 @@ export const claimService = {
   async getAllClaims(status?: string, insurancePlanId?: string): Promise<Claim[]> {
     let url = `${API_BASE_URL}/all`
     const params = new URLSearchParams()
-    
+    // commit depploy
     if (status) {
       params.append('status', status)
     }
